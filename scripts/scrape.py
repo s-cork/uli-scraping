@@ -36,10 +36,12 @@ def alert_and_exit(error_message, e=None):
     logger.error(f"Script stopped: {error_message}")
     try:
         beepy.beep(sound="error")  # Other options: 'ready', 'success', 'warning'
-    except Exception:
+    except:
         # Fallback if beepy fails
         print("\a")  # System bell
-    raise e or SystemExit(1)
+
+    logger.error(f"EXITING {e!r}")
+    raise SystemExit(1)
 
 
 def generate_page_url(base_url, page_num):
@@ -231,7 +233,7 @@ async def scrape_listings(ids_to_scrape):
 
         results = []
         current_batch = []
-        batch_size = 20
+        batch_size = 5
 
         try:
             for index, data_id in enumerate(ids_to_scrape, 1):
@@ -256,6 +258,7 @@ async def scrape_listings(ids_to_scrape):
                         current_batch = []
 
                 except Exception as e:
+                    write_batch_to_csv(current_batch)
                     alert_and_exit(f"Error processing {detail_url}: {str(e)}", e)
 
         finally:
